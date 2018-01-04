@@ -1,0 +1,12 @@
+[package]
+name = "jekuthiel"
+version = "0.1.0"
+authors = ["Samuel Moriarty <insomnia.array@google.com>"]
+
+[dependencies]
+byteorder = "1"
+bytes = "0.4"
+
+[build-dependencies]
+bindgen = "0.26"
+cmake = "0.1"

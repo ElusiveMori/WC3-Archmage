@@ -1,0 +1,6 @@
+[package]
+name = "tabeal"
+version = "0.1.0"
+authors = ["Samuel Moriarty <insomnia.array@gmail.com>"]
+
+[dependencies]
