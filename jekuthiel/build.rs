@@ -18,7 +18,7 @@ fn generate_bncsutil_bindings() {
 }
 
 fn compile_bncsutil() {
-    let dst = cmake::build("bncsutil");
+    let dst = cmake::Config::new("bncsutil/").build();
 
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("cargo:rustc-link-lib=static=bncsutil");
