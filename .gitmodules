@@ -1,0 +1,3 @@
+[submodule "jekuthiel/bncsutil"]
+	path = jekuthiel/bncsutil
+	url = git@github.com:BNETDocs/bncsutil.git
