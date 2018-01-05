@@ -20,6 +20,7 @@ fn generate_bncsutil_bindings() {
 fn compile_bncsutil() {
     let dst = cmake::Config::new("bncsutil/")
         .define("CMAKE_MODULE_PATH", format!("{}{}", env!("CARGO_MANIFEST_DIR"), "/bncsutil/CMake/Modules"))
+        .build_target("bncsutil")
         .build();
 
     println!("cargo:rustc-link-search=native={}", dst.display());
