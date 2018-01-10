@@ -3,12 +3,12 @@
 use bytes::*;
 use super::*;
 
-struct GetAdvListEx<R: Buf> {
+pub struct GetAdvListEx {
     count: u32,
-    status: GetAdvListExStatus<R>
+    status: GetAdvListExStatus
 }
 
-struct GetAdvListExItem<R: Buf> {
+pub struct GetAdvListExItem {
     game_settings: u32,
     language_id: u32,
     address_family: u16,
@@ -16,24 +16,24 @@ struct GetAdvListExItem<R: Buf> {
     host_ip: u32,
     game_status: u32,
     elapsed_time: u32,
-    game_name: R,
-    game_password: R,
-    game_statstring: R,
+    game_name: Vec<u8>,
+    game_password: Vec<u8>,
+    game_statstring: Vec<u8>,
 }
 
-enum GetAdvListExStatus<R: Buf> {
-    OK(Vec<GetAdvListExItem<R>>),
+pub enum GetAdvListExStatus {
+    OK(Vec<GetAdvListExItem>),
     EMPTY(u32)
 }
 
-struct EnterChat<R: Buf> {
-    unique_name: R,
-    statstring: R,
-    account_name: R
+pub struct EnterChat {
+    unique_name: Vec<u8>,
+    statstring: Vec<u8>,
+    account_name: Vec<u8>
 }
 
 #[derive(Copy, Clone)]
-enum ChatEventID {
+pub enum ChatEventID {
     ShowUser = 0x01,
     Join = 0x02,
     Leave = 0x03,
@@ -55,7 +55,7 @@ enum ChatEventID {
 }
 
 impl ChatEventID {
-    fn from_id(id: u32) -> Self {
+    pub fn from_id(id: u32) -> Self {
         match id {
             0x01 => ChatEventID::ShowUser,
             0x02 => ChatEventID::Join,
@@ -79,16 +79,16 @@ impl ChatEventID {
     }
 }
 
-struct ChatEvent<R: Buf> {
+pub struct ChatEvent {
     event_id: ChatEventID,
     user_flags: u32,
     ping: u32,
-    username: R,
-    text: R
+    username: Vec<u8>,
+    text: Vec<u8>
 }
 
 #[derive(Copy, Clone)]
-enum StartAdvEx3Status {
+pub enum StartAdvEx3Status {
     Ok = 0x00,
     Failed = 0x01,
     Invalid = 0xFF
@@ -104,65 +104,65 @@ impl StartAdvEx3Status {
     }
 }
 
-struct StartAdvEx3 {
+pub struct StartAdvEx3 {
     status: StartAdvEx3Status
 }
 
-struct Ping {
+pub struct Ping {
     value: u32
 }
 
-struct AuthInfo<R: Buf> {
+pub struct AuthInfo {
     logon_type: u32,
     server_token: u32,
     udp_value: u32,
     mpq_filetime: u64,
-    mpq_filename: R,
-    value_string: R,
+    mpq_filename: Vec<u8>,
+    value_string: Vec<u8>,
     server_signature: [u8; 128]
 }
 
-struct AuthCheck<R: Buf> {
+pub struct AuthCheck {
     status: u32,
-    info: R
+    info: Vec<u8>
 }
 
-struct AuthAccountLogon {
+pub struct AuthAccountLogon {
     status: u32,
     salt: [u8; 32],
     server_key: [u8; 32] 
 }
 
-struct AuthAccountLogonProof<R: Buf> {
+pub struct AuthAccountLogonProof {
     status: u32,
     proof: [u8; 20],
-    info: R
+    info: Vec<u8>
 }
 
 type E = LittleEndian;
 
-trait PacketReader<R: Buf> {
-    fn alloc_slice(buf: &mut R, start: usize, end: usize) -> R;
-
-    fn read_header(buf: &mut R) -> (PacketID, u16) {
+pub trait PacketReader<R: Buf> {
+    fn read_header(&self, buf: &mut R) -> (PacketID, usize) {
         // discard protocol id
         buf.get_u8();
         let id = PacketID::from_id(buf.get_u8());
-        let length = buf.get_u16::<E>();
+        let length = buf.get_u16::<E>() as usize;
 
         (id, length)
     }
 
-    fn read_cstring(buf: &mut R) -> R {
+    fn read_cstring(buf: &mut R) -> Vec<u8> {
         let null_pos = buf.iter().position(|c| c == 0).unwrap();
-        let slice = Self::alloc_slice(buf, 0, null_pos);
-        buf.advance(null_pos + 1);
+        let mut slice = Vec::with_capacity(null_pos);
+        buf.copy_to_slice(&mut slice);
+        // skip null byte
+        buf.advance(1);
         slice
     }
 
     fn read_null(_: &mut R) {}
 
-    fn read_get_adv_list_ex(buf: &mut R) -> GetAdvListEx<R> {
+    fn read_get_adv_list_ex(buf: &mut R) -> GetAdvListEx {
         let count = buf.get_u32::<E>();
 
         if count == 0 {
@@ -207,7 +207,7 @@ trait PacketReader<R: Buf> {
         }
     }
 
-    fn read_enter_chat(buf: &mut R) -> EnterChat<R> {
+    fn read_enter_chat(buf: &mut R) -> EnterChat {
         let unique_name = Self::read_cstring(buf);
         let statstring = Self::read_cstring(buf);
         let account_name = Self::read_cstring(buf);
@@ -219,7 +219,7 @@ trait PacketReader<R: Buf> {
         }
     }
 
-    fn read_chat_event(buf: &mut R) -> ChatEvent<R> {
+    fn read_chat_event(buf: &mut R) -> ChatEvent {
         let event_id = ChatEventID::from_id(buf.get_u32::<LittleEndian>());
         let user_flags = buf.get_u32::<LittleEndian>();
         let ping = buf.get_u32::<LittleEndian>();
@@ -250,7 +250,7 @@ trait PacketReader<R: Buf> {
         }
     }
 
-    fn read_auth_info(buf: &mut R) -> AuthInfo<R> {
+    fn read_auth_info(buf: &mut R) -> AuthInfo {
         let logon_type = buf.get_u32::<LittleEndian>();
         let server_token = buf.get_u32::<LittleEndian>();
         let udp_value = buf.get_u32::<LittleEndian>();
@@ -271,7 +271,7 @@ trait PacketReader<R: Buf> {
         }
     }
 
-    fn read_auth_check(buf: &mut R) -> AuthCheck<R> {
+    fn read_auth_check(buf: &mut R) -> AuthCheck {
         AuthCheck {
             status: buf.get_u32::<LittleEndian>(),
             info: Self::read_cstring(buf)
@@ -293,7 +293,7 @@ trait PacketReader<R: Buf> {
         }
     }
 
-    fn read_auth_account_logon_proof(buf: &mut R) -> AuthAccountLogonProof<R> {
+    fn read_auth_account_logon_proof(buf: &mut R) -> AuthAccountLogonProof {
         let status = buf.get_u32::<LittleEndian>();
         let mut proof = [0u8; 20];
         buf.take(20).copy_to_slice(&mut proof);

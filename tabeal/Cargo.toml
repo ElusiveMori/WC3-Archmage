@@ -4,3 +4,11 @@ version = "0.1.0"
 authors = ["Samuel Moriarty <insomnia.array@gmail.com>"]
 
 [dependencies]
+jekuthiel = {path = "../jekuthiel", version = "0.1.0"}
+tokio-core = "0.1"
+tokio-io = "0.1"
+futures = "0.1"
+
+[[bin]]
+name = "test"
+path = "src/bin/test.rs"

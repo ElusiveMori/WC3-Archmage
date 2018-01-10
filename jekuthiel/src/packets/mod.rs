@@ -1,10 +1,13 @@
 // reference: https://bnetdocs.org/packet/index
 #![allow(dead_code)]
 
-mod c2s;
-mod s2c;
+pub mod c2s;
+pub mod s2c;
 
-enum PacketID {
+use bytes::Bytes;
+
+#[derive(Clone, Copy)]
+pub enum PacketID {
     UNKNOWN                = -1,
     NULL                   = 0,   // 0x0
     STOPADV                = 2,   // 0x2
@@ -23,7 +26,7 @@ enum PacketID {
 }
 
 impl PacketID {
-    fn from_id(id: u8) -> PacketID {
+    pub fn from_id(id: u8) -> PacketID {
         match id {
             0 => PacketID::NULL,
             2 => PacketID::STOPADV,
@@ -41,4 +44,12 @@ impl PacketID {
             _ => PacketID::UNKNOWN
         }
     }
+}
+
+pub struct BNetIncomingPacket {
+    pub lol: u8
+}
+
+pub struct BNetOutgoingPacket {
+    pub data: Bytes
 }

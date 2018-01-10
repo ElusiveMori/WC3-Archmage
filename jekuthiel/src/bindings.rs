@@ -51,3 +51,89 @@ extern "C" {
     pub fn kd_isValid(decoder: ::std::os::raw::c_int)
      -> ::std::os::raw::c_int;
 }
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct _nls {
+    _unused: [u8; 0],
+}
+pub type nls_t = _nls;
+extern "C" {
+    pub fn nls_init(username: *const ::std::os::raw::c_char,
+                    password: *const ::std::os::raw::c_char) -> *mut nls_t;
+}
+extern "C" {
+    pub fn nls_init_l(username: *const ::std::os::raw::c_char,
+                      username_length: ::std::os::raw::c_ulong,
+                      password: *const ::std::os::raw::c_char,
+                      password_length: ::std::os::raw::c_ulong) -> *mut nls_t;
+}
+extern "C" {
+    pub fn nls_free(nls: *mut nls_t);
+}
+extern "C" {
+    pub fn nls_reinit(nls: *mut nls_t,
+                      username: *const ::std::os::raw::c_char,
+                      password: *const ::std::os::raw::c_char) -> *mut nls_t;
+}
+extern "C" {
+    pub fn nls_reinit_l(nls: *mut nls_t,
+                        username: *const ::std::os::raw::c_char,
+                        username_length: ::std::os::raw::c_ulong,
+                        password: *const ::std::os::raw::c_char,
+                        password_length: ::std::os::raw::c_ulong)
+     -> *mut nls_t;
+}
+extern "C" {
+    pub fn nls_account_create(nls: *mut nls_t,
+                              buf: *mut ::std::os::raw::c_char,
+                              bufSize: ::std::os::raw::c_ulong)
+     -> ::std::os::raw::c_ulong;
+}
+extern "C" {
+    pub fn nls_account_logon(nls: *mut nls_t,
+                             buf: *mut ::std::os::raw::c_char,
+                             bufSize: ::std::os::raw::c_ulong)
+     -> ::std::os::raw::c_ulong;
+}
+extern "C" {
+    pub fn nls_account_change_proof(nls: *mut nls_t,
+                                    buf: *mut ::std::os::raw::c_char,
+                                    new_password:
+                                        *const ::std::os::raw::c_char,
+                                    B: *const ::std::os::raw::c_char,
+                                    salt: *const ::std::os::raw::c_char)
+     -> *mut nls_t;
+}
+extern "C" {
+    pub fn nls_get_S(nls: *mut nls_t, out: *mut ::std::os::raw::c_char,
+                     B: *const ::std::os::raw::c_char,
+                     salt: *const ::std::os::raw::c_char);
+}
+extern "C" {
+    pub fn nls_get_v(nls: *mut nls_t, out: *mut ::std::os::raw::c_char,
+                     salt: *const ::std::os::raw::c_char);
+}
+extern "C" {
+    pub fn nls_get_A(nls: *mut nls_t, out: *mut ::std::os::raw::c_char);
+}
+extern "C" {
+    pub fn nls_get_K(nls: *mut nls_t, out: *mut ::std::os::raw::c_char,
+                     S: *const ::std::os::raw::c_char);
+}
+extern "C" {
+    pub fn nls_get_M1(nls: *mut nls_t, out: *mut ::std::os::raw::c_char,
+                      B: *const ::std::os::raw::c_char,
+                      salt: *const ::std::os::raw::c_char);
+}
+extern "C" {
+    pub fn nls_check_M2(nls: *mut nls_t,
+                        var_M2: *const ::std::os::raw::c_char,
+                        B: *const ::std::os::raw::c_char,
+                        salt: *const ::std::os::raw::c_char)
+     -> ::std::os::raw::c_int;
+}
+extern "C" {
+    pub fn nls_check_signature(address: u32,
+                               signature_raw: *const ::std::os::raw::c_char)
+     -> ::std::os::raw::c_int;
+}

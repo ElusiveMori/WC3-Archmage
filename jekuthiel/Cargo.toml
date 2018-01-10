@@ -6,7 +6,14 @@ authors = ["Samuel Moriarty <insomnia.array@google.com>"]
 [dependencies]
 byteorder = "1"
 bytes = "0.4"
+tokio-core = "0.1"
+tokio-io = "0.1"
+futures = "0.1"
 
 [build-dependencies]
 bindgen = "0.26"
-cmake = "0.1"
+#cmake = "0.1"
+
+[[bin]]
+name = "test"
+path = "src/bin/test.rs"
